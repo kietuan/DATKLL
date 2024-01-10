@@ -1,0 +1,4 @@
+*.jou
+*.log
+TEST/
+RISCV-with-UART.runs

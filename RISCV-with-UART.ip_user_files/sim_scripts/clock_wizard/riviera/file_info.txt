@@ -1,0 +1,4 @@
+clock_wizard_clk_wiz_0_0_clk_wiz.v,verilog,xil_defaultlib,../../../bd/clock_wizard/ip/clock_wizard_clk_wiz_0_0/clock_wizard_clk_wiz_0_0_clk_wiz.v,incdir="../../../../RISCV-with-UART.gen/sources_1/bd/clock_wizard/ipshared/30ef"incdir="../../../../RISCV-with-UART.gen/sources_1/bd/clock_wizard/ipshared/30ef"
+clock_wizard_clk_wiz_0_0.v,verilog,xil_defaultlib,../../../bd/clock_wizard/ip/clock_wizard_clk_wiz_0_0/clock_wizard_clk_wiz_0_0.v,incdir="../../../../RISCV-with-UART.gen/sources_1/bd/clock_wizard/ipshared/30ef"incdir="../../../../RISCV-with-UART.gen/sources_1/bd/clock_wizard/ipshared/30ef"
+clock_wizard.v,verilog,xil_defaultlib,../../../bd/clock_wizard/sim/clock_wizard.v,incdir="../../../../RISCV-with-UART.gen/sources_1/bd/clock_wizard/ipshared/30ef"incdir="../../../../RISCV-with-UART.gen/sources_1/bd/clock_wizard/ipshared/30ef"
+glbl.v,Verilog,xil_defaultlib,glbl.v
