@@ -8,5 +8,4 @@ In this project, we implement a single-cycle RISC-V 32 with IM extensions on FPG
 
 [Some tested programs can run on RISC-V](./testcase/)
 
-
-
+[MIT LICENSE](./LICENSE)
