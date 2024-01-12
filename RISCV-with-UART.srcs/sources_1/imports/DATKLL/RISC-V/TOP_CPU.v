@@ -3,20 +3,23 @@
 
 module RISCV_CPU
 (
-    input wire  [0:0] clk,
-    input wire  [0:0] SYS_reset,
+    input             clk,
+    input             SYS_reset,
     input             SYS_start_button,
-    input wire        PC_data_valid,
-    input wire[7:0]   PC_data,
+    input             terminate_interrupt_button,
+
+    input             PC_data_valid,
+    input     [7:0]   PC_data,
     input             transmitter_buffer_full,
     
     output            DMEM_transmit_request,
     output      [7:0] DMEM_data_transmit,
-    output            execution_enable,
+    output            CPU_executing,
     output            CPU_finish_execution
 );
 
     reg  [31:0] PC;
+    reg         terminate_interrupt;
 
     wire [0:0] invalid_instruction;
     wire [31:0]instruction;
@@ -35,16 +38,23 @@ module RISCV_CPU
     wire [0:0] REG_write_enable;
     wire [31:0]REG_write_value, REG_rs1_data, REG_rs2_data;
 
-    assign     CPU_finish_execution = execution_enable && invalid_instruction;
+    assign     CPU_finish_execution = CPU_executing && (invalid_instruction || terminate_interrupt);
 
     always @(posedge clk)
     begin
         if (SYS_reset)
         begin
             PC <= `INS_START_ADDRESS;
+            terminate_interrupt <= 0;
         end
+        
         else 
+        begin
             PC <= new_PC;
+
+            if (CPU_executing && terminate_interrupt_button) terminate_interrupt <= 1;
+        end
+
     end
 
     DATA_MEMORY DMEM //the block hold the insrtuciton and data. It can be read every time and written at the clock. once
@@ -76,7 +86,7 @@ module RISCV_CPU
         
         //OUTPUT
         .instruction        (instruction), //got the instruction
-        .execution_enable   (execution_enable),
+        .CPU_executing      (CPU_executing),
         .PC_data_valid      (PC_data_valid),
         .PC_data            (PC_data)
     );
@@ -108,7 +118,7 @@ module RISCV_CPU
         .REG_rs2_data       (REG_rs2_data),
         .MEM_read_data      (MEM_read_data),
         .PC                 (PC),
-        .execution_enable   (execution_enable),
+        .CPU_executing   (CPU_executing),
 
         //OUTPUT
         .new_PC             (new_PC),
@@ -134,12 +144,13 @@ endmodule
 
 module DATA_PATH
 (
+    input        terminate_interrupt,
     input [31:0] instruction,
     input [31:0] REG_rs1_data,
     input [31:0] REG_rs2_data,
     input [31:0] MEM_read_data,
     input [31:0] PC,
-    input        execution_enable,
+    input        CPU_executing,
 
     output reg [31:0] new_PC,
     output reg [31:0] REG_write_value,
@@ -173,7 +184,7 @@ module DATA_PATH
 
     reg branch_taken;
 
-    always @(instruction, opcode,rd,rs1,rs2,shamt,funct3,funct7,S_immed,I_immed, B_immed,J_immed,U_immed,   REG_rs1_data, REG_rs2_data, MEM_read_data, PC, execution_enable) // all the input
+    always @(terminate_interrupt, instruction, opcode,rd,rs1,rs2,shamt,funct3,funct7,S_immed,I_immed, B_immed,J_immed,U_immed,   REG_rs1_data, REG_rs2_data, MEM_read_data, PC, CPU_executing) // all the input
     begin
         //set the default, also prevent latch
         new_PC              = PC + 4;
@@ -346,7 +357,7 @@ module DATA_PATH
             default: invalid_instruction = 1;
         endcase
         
-        stop_execution = invalid_instruction || (!execution_enable);
+        stop_execution = invalid_instruction || (!CPU_executing) || terminate_interrupt;
         if (stop_execution)
         begin
             REG_write_enable    = 0;

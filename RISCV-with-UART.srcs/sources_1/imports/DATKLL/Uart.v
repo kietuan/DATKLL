@@ -1,14 +1,18 @@
 module TOP
 (
-    input SYS_clk, SYS_reset, SYS_start_button,
+    input SYS_clk,
+    input SYS_reset,
+    input SYS_start_button,
+    input terminate_interrupt_button,
 
-    // rx interface
     input rx,
+
+    input INS_DATA_sw,
     
     // tx interface
     output tx,
     output clk_locked,
-    output CPU_execution,
+    output CPU_executing,
     output CPU_finish_execution
 );
     wire clk_5;
@@ -22,7 +26,7 @@ module TOP
     wire       PC_data_valid;
     wire [7:0] PC_data;  
 
-    wire       IMEM_write_request = ~CPU_execution;
+    wire       IMEM_write_request = ~CPU_executing;
     wire       data_fromMem_valid;
     wire       transmitter_request;
     wire       transmitter_buffer_full, transmitter_buffer_empty;
@@ -30,7 +34,7 @@ module TOP
     wire [7:0] DMEM_data_transmit;
     
 
-    clock_wizard_wrapper clock_generator
+    clock_wrapper clock_generator
     (   
         //INPUT
         .sys_clock  (SYS_clk),
@@ -77,6 +81,8 @@ module TOP
         .clk                    (clk_5),
         .SYS_reset              (SYS_reset),
         .SYS_start_button       (SYS_start_button),
+        .terminate_interrupt_button(terminate_interrupt_button),
+        
         .PC_data_valid          (PC_data_valid),
         .PC_data                (PC_data),
         .transmitter_buffer_full(transmitter_buffer_full),
@@ -85,7 +91,7 @@ module TOP
         .DMEM_transmit_request  (DMEM_transmit_request),
         .DMEM_data_transmit     (DMEM_data_transmit),
         .CPU_finish_execution   (CPU_finish_execution),
-        .execution_enable       (CPU_execution)
+        .CPU_executing          (CPU_executing)
     );
 
     fifo_buffer mem_to_Transmitter_buffer

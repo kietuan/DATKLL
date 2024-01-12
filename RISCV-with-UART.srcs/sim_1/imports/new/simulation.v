@@ -109,7 +109,7 @@ module simulation
         .DMEM_transmit_request  (DMEM_transmit_request),
         .DMEM_data_transmit     (DMEM_data_transmit),
         .instruction            (instruction),
-        .execution_enable       (execution_enable),
+        .CPU_executing          (CPU_executing),
         .stop_execution         (stop_execution)
     );
 
