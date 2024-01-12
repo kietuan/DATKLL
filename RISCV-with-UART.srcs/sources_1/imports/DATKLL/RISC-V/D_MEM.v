@@ -17,13 +17,17 @@ module DATA_MEMORY
     input             CPU_finish_execution, 
     input             transmitter_buffer_full,
 
+    input             CPU_execute_enable,
+    input             data_to_CPU_valid,
+    input     [7:0]   data_to_CPU,
+
     output            DMEM_transmit_request,
     output      [7:0] DMEM_data_transmit,
 
     output reg [31:0] MEM_read_data
 );
     reg [7:0] data [`DATA_START_ADDRESS :`DATA_END_ADDRESS];
-    
+    reg [31:0]initialize_address;
     reg [31:0]DMEM_transmit_address;
 
     assign DMEM_data_transmit    = data [DMEM_transmit_address];
@@ -55,10 +59,19 @@ module DATA_MEMORY
     begin
         if (SYS_reset)
         begin
-            //TODO Kieungan: initialize the memory in the start of
+            initialize_address <= `DATA_START_ADDRESS;
+
             for (i = `DATA_START_ADDRESS ; i <=`DATA_END_ADDRESS; i = i + 1)
                 data [i] = 0;
+        end
 
+        else if (CPU_execute_enable == 0)
+        begin
+            if (data_to_CPU_valid && (initialize_address <= `DATA_END_ADDRESS) )
+            begin
+                data[initialize_address] <= data_to_CPU;
+                initialize_address       <= initialize_address + 1;
+            end
         end
 
         else if (MEM_write_length == 2'b01) //store 1 byte

@@ -6,15 +6,15 @@ module INS_MEMORY
     input            SYS_start_button,
     input  wire [31:0]  PC,
 
-    input      PC_data_valid,
-    input[7:0] PC_data,  
+    input      inst_to_CPU_valid,
+    input[7:0] inst_to_CPU,  
 
-    output reg          CPU_executing,
+    output reg          CPU_execute_enable,
     output wire [31:0]  instruction
 );
     reg [7:0] data [(`INS_START_ADDRESS) : (`INS_START_ADDRESS) + 1000];
 
-    reg [31:0] PC_to_mem_address;
+    reg [31:0] initialize_address;
 
     assign instruction[31:0] = {data[PC], data[PC+1], data[PC+2], data[PC+3]};
 
@@ -28,8 +28,8 @@ module INS_MEMORY
                 data[i] <= 0;
             end
 
-            CPU_executing <= 0;
-            PC_to_mem_address<= `INS_START_ADDRESS;
+            CPU_execute_enable <= 0;
+            initialize_address<= `INS_START_ADDRESS;
 
             `ifdef TESTING
             $readmemh("C:/Users/tuankiet/Desktop/RISC-V/test/input_text.txt", data);
@@ -37,14 +37,14 @@ module INS_MEMORY
         end
 
         else if (SYS_start_button)
-            CPU_executing <= 1;
+            CPU_execute_enable <= 1;
 
-        else if (CPU_executing == 0)
+        else if (CPU_execute_enable == 0)
         begin
-            if (PC_data_valid)
+            if (inst_to_CPU_valid)
             begin
-                data[PC_to_mem_address] <= PC_data;
-                PC_to_mem_address       <= PC_to_mem_address + 1;
+                data[initialize_address] <= inst_to_CPU;
+                initialize_address       <= initialize_address + 1;
             end     
 
 

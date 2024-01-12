@@ -4,11 +4,14 @@
 
 .data
     result: .word   0       # Variable to store the GCD, or s0
-
+    first:  .word 36
+    second: .word 48
 .text
     # Load the two numbers into registers
-    li      a0, 36 #first number
-    li      a1, 48 # second number
+    #li      a0, 36 #first number
+    #li      a1, 48 # second number
+    lw a0, first # frist number
+    lw a1, second#second number 
     # Call the GCD function
     jal     ra, gcd
 
