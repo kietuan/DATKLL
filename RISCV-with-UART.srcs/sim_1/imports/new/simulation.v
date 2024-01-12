@@ -2,18 +2,18 @@ module simulation
 (
 );
 
-    reg SYS_reset, SYS_start_button, CPU_clk;
+    reg SYS_reset, SYS_start_button, clk;
     reg IO_clk;
     reg [7:0] input_ins;
-    reg        write_toMEM_request;
+    reg        write_instruction_request;
     wire       receive_buffer_full, receive_buffer_empty;
     wire       PC_data_valid;
     wire [7:0] PC_data;  
 
     wire [31:0] instruction;
-    wire        execution_enable;
+    wire        CPU_execute_enable;
     wire        stop_execution;
-    wire       IMEM_write_request = ~execution_enable;
+    wire        CPU_read_request = ~CPU_execute_enable;
 
     wire       DMEM_transmit_request;
     wire [7:0] DMEM_data_transmit;
@@ -27,40 +27,36 @@ module simulation
 
     initial
     begin //test
-        #0.5 CPU_clk = 0;
-        forever #0.5 CPU_clk = ~CPU_clk;
+        #0.5 clk = 0;
+        forever #0.5 clk = ~clk;
     end 
 
-    initial begin
-        IO_clk = 0;
-        forever #1 IO_clk = ~IO_clk;
-    end
 
     initial 
     begin
         SYS_reset       = 1;
-        #10 SYS_reset  = 0;
+        #1.1 SYS_reset  = 0;
 
-        write_toMEM_request = 0;
+        write_instruction_request = 0;
         SYS_start_button    = 0;
 
-        #3.0 write_toMEM_request = 1;
+        #1.5 write_instruction_request = 1;
              input_ins =  'hff;
-        #2.0 input_ins =  'h60;
-        #2.0 input_ins =  'h01;
-        #2.0 input_ins =  'h93;
+        #1.0 input_ins =  'h60;
+        #1.0 input_ins =  'h01;
+        #1.0 input_ins =  'h93;1
 
-        #2.0 input_ins =  'h0f;
-        #2.0 input_ins =  'hc1;
-        #2.0 input_ins =  'h00;
-        #2.0 input_ins =  'h97;
+        #1.0 input_ins =  'h0f;
+        #1.0 input_ins =  'hc1;
+        #1.0 input_ins =  'h00;
+        #1.0 input_ins =  'h97;
 
-        #2.0 input_ins =  'hfe;
-        #2.0 input_ins =  'h30;
-        #2.0 input_ins =  'hae;
-        #2.0 input_ins =  'h23;
+        #1.0 input_ins =  'hfe;
+        #1.0 input_ins =  'h30;
+        #1.0 input_ins =  'hae;
+        #1.0 input_ins =  'h23;
 
-        #2.0 write_toMEM_request = 0;
+        #1.0 write_instruction_request = 0;
 
         #5.0 SYS_start_button = 1;
     end
@@ -69,49 +65,74 @@ module simulation
         #70 $finish;
     end
 
-    fifo_buffer Receiver_to_mem_buffer (
-        .writer_clock   (IO_clk), 
-        .reader_clock   (CPU_clk),
+    fifo_buffer receive_data_buffer
+    (
+        //INPUT
+        .clk            (clk),
         .SYS_reset      (SYS_reset), 
-        .write_request  (write_toMEM_request), 
+        .write_request  (write_data_request), 
+        .data_in        (data_from_rx), 
+        .read_request   (CPU_read_request),
+
+        //OUTPUT
+        .data_valid     (data_to_CPU_valid),
+        .data_out       (data_to_CPU)
+    );;
+
+    fifo_buffer receive_instruction_buffer 
+    (
+        //INPUT
+        .clk            (clk),
+        .SYS_reset      (SYS_reset), 
+        .write_request  (write_instruction_request), 
         .data_in        (input_ins), 
-        .read_request   (IMEM_write_request),
-        .full           (receive_buffer_full), 
-        .empty          (receive_buffer_empty),
-        .data_valid     (PC_data_valid),
-        .data_out       (PC_data)
+        .read_request   (CPU_read_request),
+
+        //OUTPUT
+        // .full           (receive_buffer_full), 
+        // .empty          (receive_buffer_empty),
+        .data_valid     (inst_to_CPU_valid),
+        .data_out       (inst_to_CPU)
     );
 
-
-    fifo_buffer mem_to_Transmitter_buffer
+    
+    RISCV_CPU RISCV_CPU
     (
-        .writer_clock   (CPU_clk), 
-        .reader_clock   (IO_clk),
+        //INPUT
+        .clk                    (clk),
+        .SYS_reset              (SYS_reset),
+        .SYS_start_button       (SYS_start_button),
+        .terminate_interrupt_button(terminate_interrupt_button),
+        
+        .inst_to_CPU_valid      (inst_to_CPU_valid),
+        .inst_to_CPU            (inst_to_CPU),
+        .data_to_CPU_valid      (data_to_CPU_valid),
+        .data_to_CPU            (data_to_CPU),
+        .transmitter_buffer_full(transmitter_buffer_full),
+
+        //OUTPUT
+        .DMEM_transmit_request  (DMEM_transmit_request),
+        .DMEM_data_transmit     (DMEM_data_transmit),
+        .CPU_finish_execution   (CPU_finish_execution),
+        .CPU_execute_enable     (CPU_execute_enable)
+    );
+
+    fifo_buffer transmit_data_buffer
+    (
+        //INPUT
+        .clk            (clk),
         .SYS_reset      (SYS_reset), 
         .write_request  (DMEM_transmit_request), 
         .data_in        (DMEM_data_transmit), 
         .read_request   (transmitter_request),
+
+        //OUTPUT
         .full           (transmitter_buffer_full), 
-        .empty          (),
+        .empty          (transmitter_buffer_empty),
         .data_valid     (data_fromMem_valid),
         .data_out       (data_fromMem)
     );
 
-    RISCV_CPU RISCV_CPU
-    (
-        .clk                    (CPU_clk),
-        .SYS_reset              (SYS_reset),
-        .SYS_start_button       (SYS_start_button),
-
-        .PC_data_valid          (PC_data_valid),
-        .PC_data                (PC_data),
-        .transmitter_buffer_full(transmitter_buffer_full),
-        .DMEM_transmit_request  (DMEM_transmit_request),
-        .DMEM_data_transmit     (DMEM_data_transmit),
-        .instruction            (instruction),
-        .CPU_executing          (CPU_executing),
-        .stop_execution         (stop_execution)
-    );
 
 endmodule
 
