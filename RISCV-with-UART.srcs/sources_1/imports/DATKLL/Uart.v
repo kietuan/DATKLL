@@ -34,7 +34,7 @@ module TOP
     wire [7:0] DMEM_data_transmit;
     
 
-    clock_wrapper clock_generator
+    clock_wizard_wrapper clock_generator
     (   
         //INPUT
         .sys_clock  (SYS_clk),
