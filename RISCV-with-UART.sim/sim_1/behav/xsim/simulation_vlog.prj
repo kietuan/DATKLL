@@ -1,0 +1,14 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  --include "../../../../RISCV-with-UART.gen/sources_1/bd/clock_wizard/ipshared/30ef" --include "../../../../RISCV-with-UART.srcs/sources_1/imports/DATKLL/RISC-V" --include "../../../../RISCV-with-UART.srcs/sources_1/imports/DATKLL" \
+"../../../../RISCV-with-UART.srcs/sources_1/imports/DATKLL/RISC-V/CPU.v" \
+"../../../../RISCV-with-UART.srcs/sources_1/imports/DATKLL/RISC-V/D_MEM.v" \
+"../../../../RISCV-with-UART.srcs/sources_1/imports/DATKLL/RISC-V/I_MEM.v" \
+"../../../../RISCV-with-UART.srcs/sources_1/imports/DATKLL/RISC-V/REGISTER_FILE.v" \
+"../../../../RISCV-with-UART.srcs/sources_1/imports/DATKLL/fifo_mem.v" \
+"../../../../RISCV-with-UART.srcs/sim_1/imports/new/simulation.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

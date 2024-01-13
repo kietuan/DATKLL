@@ -1,29 +1,34 @@
 module simulation
 (
 );
-
+    reg terminate_interrupt_button = 0;
     reg SYS_reset, SYS_start_button, clk;
-    reg IO_clk;
-    reg [7:0] input_ins;
-    reg        write_instruction_request;
-    wire       receive_buffer_full, receive_buffer_empty;
-    wire       PC_data_valid;
-    wire [7:0] PC_data;  
+    
+    reg [7:0]   input_ins;
+    reg [7:0]   input_data;
+    reg         write_instruction_request;
+    reg         write_data_request;
 
-    wire [31:0] instruction;
+    wire        inst_to_CPU_valid;
+    wire [7:0]  inst_to_CPU;
+    wire        data_to_CPU_valid;
+    wire [7:0]  data_to_CPU;
+
     wire        CPU_execute_enable;
-    wire        stop_execution;
+    wire        CPU_finish_execution;
     wire        CPU_read_request = ~CPU_execute_enable;
 
-    wire       DMEM_transmit_request;
-    wire [7:0] DMEM_data_transmit;
+    wire        DMEM_transmit_request;
+    wire [7:0]  DMEM_data_transmit;
 
-    wire       transmitter_buffer_full;
+    wire        transmitter_buffer_full, transmitter_buffer_empty;
 
-    reg        transmitter_request = 1;
 
-    wire       data_fromMem_valid;
-    wire [7:0] data_fromMem;   // to tx
+    wire        data_fromCPU_valid;
+    wire [7:0]  data_fromCPU;   // to tx
+
+    reg         transmitter_request = 1;
+
 
     initial
     begin //test
@@ -31,6 +36,9 @@ module simulation
         forever #0.5 clk = ~clk;
     end 
 
+    initial begin
+        #100 $finish;
+    end
 
     initial 
     begin
@@ -41,10 +49,11 @@ module simulation
         SYS_start_button    = 0;
 
         #1.5 write_instruction_request = 1;
+             write_data_request = 0;
              input_ins =  'hff;
         #1.0 input_ins =  'h60;
         #1.0 input_ins =  'h01;
-        #1.0 input_ins =  'h93;1
+        #1.0 input_ins =  'h93;
 
         #1.0 input_ins =  'h0f;
         #1.0 input_ins =  'hc1;
@@ -58,12 +67,17 @@ module simulation
 
         #1.0 write_instruction_request = 0;
 
+             write_data_request = 1;
+             input_data = 'h00;
+        #1.0 input_data = 'h01;
+        #1.0 input_data = 'h0c;
+
+        #1.0 write_data_request = 0;
+
         #5.0 SYS_start_button = 1;
     end
 
-    initial begin
-        #70 $finish;
-    end
+
 
     fifo_buffer receive_data_buffer
     (
@@ -71,7 +85,7 @@ module simulation
         .clk            (clk),
         .SYS_reset      (SYS_reset), 
         .write_request  (write_data_request), 
-        .data_in        (data_from_rx), 
+        .data_in        (input_data), 
         .read_request   (CPU_read_request),
 
         //OUTPUT
@@ -89,8 +103,6 @@ module simulation
         .read_request   (CPU_read_request),
 
         //OUTPUT
-        // .full           (receive_buffer_full), 
-        // .empty          (receive_buffer_empty),
         .data_valid     (inst_to_CPU_valid),
         .data_out       (inst_to_CPU)
     );
@@ -129,8 +141,8 @@ module simulation
         //OUTPUT
         .full           (transmitter_buffer_full), 
         .empty          (transmitter_buffer_empty),
-        .data_valid     (data_fromMem_valid),
-        .data_out       (data_fromMem)
+        .data_valid     (data_fromCPU_valid),
+        .data_out       (data_fromCPU)
     );
 
 
