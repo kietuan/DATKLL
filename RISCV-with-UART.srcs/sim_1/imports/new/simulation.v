@@ -36,48 +36,44 @@ module simulation
         forever #0.5 clk = ~clk;
     end 
 
-    initial begin
-        #100 $finish;
-    end
+    reg [31:0] instruction [0:99];
+    reg [7:0] data [0:15];
+    integer ins_index, data_index, i;
 
-    initial 
+    initial
     begin
-        SYS_reset       = 1;
-        #1.1 SYS_reset  = 0;
+        $readmemh("C:/Users/tuankiet/Desktop/input_text.txt", instruction);
+        $readmemh("C:/Users/tuankiet/Desktop/input_data.txt", data);
 
+        ins_index                       = 0;
+        data_index                      = 0;
+        i                               = 0;
+        write_instruction_request       = 0;
+        write_data_request              = 0;
+        SYS_start_button                = 0;
+        SYS_reset                       = 1;
+        #1.1 SYS_reset                  = 0;
+        #1.5 write_instruction_request  = 1;
+
+        for (ins_index = 0; ins_index <= 99; ins_index = ins_index + 1)
+            for (i = 24; i >= 0; i = i - 8)
+            begin
+                input_ins = instruction[ins_index][i +: 8];
+                #1.0;
+            end
+            
+        
         write_instruction_request = 0;
-        SYS_start_button    = 0;
+        write_data_request        = 1;
 
-        #1.5 write_instruction_request = 1;
-             write_data_request = 0;
-             input_ins =  'hff;
-        #1.0 input_ins =  'h60;
-        #1.0 input_ins =  'h01;
-        #1.0 input_ins =  'h93;
-
-        #1.0 input_ins =  'h0f;
-        #1.0 input_ins =  'hc1;
-        #1.0 input_ins =  'h00;
-        #1.0 input_ins =  'h97;
-
-        #1.0 input_ins =  'hfe;
-        #1.0 input_ins =  'h30;
-        #1.0 input_ins =  'hae;
-        #1.0 input_ins =  'h23;
-
-        #1.0 write_instruction_request = 0;
-
-             write_data_request = 1;
-             input_data = 'h00;
-        #1.0 input_data = 'h01;
-        #1.0 input_data = 'h0c;
-
-        #1.0 write_data_request = 0;
-
+        for (data_index = 0; data_index <= 15; data_index = data_index + 1)
+        begin
+            input_data = data[data_index];
+            #1.0;
+        end
+        write_data_request = 0;
         #5.0 SYS_start_button = 1;
     end
-
-
 
     fifo_buffer receive_data_buffer
     (
