@@ -16,6 +16,7 @@ module RISCV_CPU
     
     output            DMEM_transmit_request,
     output      [7:0] DMEM_data_transmit,
+    output     [31:0] DMEM_transmit_address,
     output            CPU_execute_enable,
     output            CPU_finish_execution
 );
@@ -78,6 +79,7 @@ module RISCV_CPU
         //OUTPUT
         .DMEM_transmit_request   (DMEM_transmit_request),
         .DMEM_data_transmit      (DMEM_data_transmit),
+        .DMEM_transmit_address   (DMEM_transmit_address),
         .MEM_read_data           (MEM_read_data)
     );
     

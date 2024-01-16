@@ -23,12 +23,12 @@ module DATA_MEMORY
 
     output            DMEM_transmit_request,
     output      [7:0] DMEM_data_transmit,
+    output reg [31:0] DMEM_transmit_address,
 
     output reg [31:0] MEM_read_data
 );
     reg [7:0] data [`DATA_START_ADDRESS :`DATA_END_ADDRESS];
     reg [31:0]initialize_address;
-    reg [31:0]DMEM_transmit_address;
 
     assign DMEM_data_transmit    = data [DMEM_transmit_address];
     assign DMEM_transmit_request = CPU_finish_execution && (`DATA_START_ADDRESS <= DMEM_transmit_address) && (DMEM_transmit_address <= `DATA_END_ADDRESS);
