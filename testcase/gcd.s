@@ -12,20 +12,7 @@
     #li      a1, 48 # second number
     lw a0, first # frist number
     lw a1, second#second number 
-    # Call the GCD function
-    jal     ra, gcd
-
-    # Exit the program
-    li      a7, 10
     
-
-# GCD function
-gcd:
-    # Save registers on the stack
-    addi    sp, sp, -8
-    sw      s0, 4(sp)
-    sw      s1, 0(sp)
-
     # Initialize variables
     mv      s0, a0      # s0 = num1
     mv      s1, a1      # s1 = num2
@@ -47,4 +34,4 @@ gcd_loop:
 gcd_done:
     # GCD is in s0, store it in the result variable
     sw      s0, result, t0
-    ecall
+

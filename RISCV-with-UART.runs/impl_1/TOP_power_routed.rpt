@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2023.1 (win64) Build 3865809 Sun May  7 15:05:29 MDT 2023
-| Date             : Sat Jan 13 02:19:43 2024
+| Date             : Tue Jan 16 21:13:06 2024
 | Host             : tuankiet running 64-bit major release  (build 9200)
 | Command          : report_power -file TOP_power_routed.rpt -pb TOP_power_summary_routed.pb -rpx TOP_power_routed.rpx
 | Design           : TOP
@@ -52,14 +52,14 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Clocks         |     0.001 |        8 |       --- |             --- |
-| Slice Logic    |     0.002 |    37404 |       --- |             --- |
-|   LUT as Logic |     0.002 |    18278 |     53200 |           34.36 |
+| Clocks         |     0.002 |        8 |       --- |             --- |
+| Slice Logic    |     0.002 |    46116 |       --- |             --- |
+|   LUT as Logic |     0.002 |    24566 |     53200 |           46.18 |
 |   CARRY4       |    <0.001 |     1342 |     13300 |           10.09 |
-|   F7/F8 Muxes  |    <0.001 |     6619 |     53200 |           12.44 |
-|   Register     |    <0.001 |    10310 |    106400 |            9.69 |
+|   F7/F8 Muxes  |    <0.001 |     7467 |     53200 |           14.04 |
+|   Register     |    <0.001 |    11237 |    106400 |           10.56 |
 |   Others       |     0.000 |       21 |       --- |             --- |
-| Signals        |     0.003 |    23974 |       --- |             --- |
+| Signals        |     0.003 |    30108 |       --- |             --- |
 | MMCM           |     0.096 |        1 |         4 |           25.00 |
 | DSPs           |    <0.001 |       15 |       220 |            6.82 |
 | I/O            |    <0.001 |       11 |       125 |            8.80 |

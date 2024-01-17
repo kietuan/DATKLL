@@ -1,6 +1,4 @@
-module simulation
-(
-);
+module simulation;
     reg terminate_interrupt_button = 0;
     reg SYS_reset, SYS_start_button, clk;
     
@@ -31,11 +29,6 @@ module simulation
     reg         transmitter_request = 1;
 
 
-    initial
-    begin //test
-        #0.5 clk = 0;
-        forever #0.5 clk = ~clk;
-    end 
 
     reg [31:0] instruction [0:99];
     reg [7:0] data [0:15];
@@ -75,6 +68,13 @@ module simulation
         write_data_request = 0;
         #5.0 SYS_start_button = 1;
     end
+
+    initial
+    begin //test
+        #0.5 clk = 0;
+        forever #0.5 clk = ~clk;
+    end 
+
 
     fifo_buffer receive_data_buffer
     (
@@ -142,6 +142,4 @@ module simulation
         .data_valid     (data_fromCPU_valid),
         .data_out       (data_fromCPU)
     );
-
-
 endmodule
